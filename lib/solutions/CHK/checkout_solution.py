@@ -1,4 +1,3 @@
-
 class CheckoutSolution:
     # skus = unicode string
     def checkout(self, skus):
@@ -17,16 +16,25 @@ class CheckoutSolution:
             'Y': 10, 'Z': 50
         }
         
-        
+        # Initialize multi-buy offers (item: [(quantity, price), ...])
+        # Offers are sorted in descending order of quantity for better customer benefit
         multi_buy_offers = {
             'A': [(5, 200), (3, 130)],
-            'B': [(2, 45)]
+            'B': [(2, 45)],
+            'H': [(10, 80), (5, 45)],
+            'K': [(2, 150)],
+            'P': [(5, 200)],
+            'Q': [(3, 80)],
+            'V': [(3, 130), (2, 90)]
         }
         
         # Get-one-free offers (buy X, get Y free)
         free_item_offers = {
             'E': (2, 'B'),  # Buy 2E, get one B free
-            'F': (2, 'F')   # Buy 2F, get one F free
+            'F': (2, 'F'),  # Buy 2F, get one F free
+            'N': (3, 'M'),  # Buy 3N, get one M free
+            'R': (3, 'Q'),  # Buy 3R, get one Q free
+            'U': (3, 'U')   # Buy 3U, get one U free
         }
         
         # Initialize total price and item counts
@@ -46,9 +54,9 @@ class CheckoutSolution:
         free_items = {}
         for item, (required_count, free_item) in free_item_offers.items():
             if item in item_counts:
-                if free_item == item:  # Self-referential offer like "2F get one F free"
-                    # We need groups of 3 where only 2 are paid
-                    groups = item_counts[item] // 3
+                if free_item == item:  # Self-referential offer like "3U get one U free"
+                    # We need groups of (required_count + 1) where only required_count are paid
+                    groups = item_counts[item] // (required_count + 1)
                     if groups > 0:
                         if item in free_items:
                             free_items[item] += groups
