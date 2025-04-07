@@ -36,6 +36,8 @@ class CheckoutSolution:
     # skus = unicode string
     def checkout(self, skus):
         # Check for illegal input
+        if skus is "":
+            return 0
         if not isinstance(skus, str) or not skus.isalpha():
             return -1
 
@@ -64,5 +66,6 @@ class CheckoutSolution:
                 total_price += count * price_table[item]
         return total_price
         
+
 
 
