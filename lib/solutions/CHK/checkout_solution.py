@@ -87,6 +87,3 @@ class CheckoutSolution:
                 total_price += count * price_table[item]
         
         return total_price
-
-
-
