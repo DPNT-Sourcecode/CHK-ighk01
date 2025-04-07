@@ -10,10 +10,10 @@ class CheckoutSolution:
         # Initialize the price table
         price_table = {
             'A': 50, 'B': 30, 'C': 20, 'D': 15, 'E': 40, 'F': 10,
-            'G': 20, 'H': 10, 'I': 35, 'J': 60, 'K': 80, 'L': 90,
+            'G': 20, 'H': 10, 'I': 35, 'J': 60, 'K': 70, 'L': 90,
             'M': 15, 'N': 40, 'O': 10, 'P': 50, 'Q': 30, 'R': 50,
-            'S': 30, 'T': 20, 'U': 40, 'V': 50, 'W': 20, 'X': 90,
-            'Y': 10, 'Z': 50
+            'S': 20, 'T': 20, 'U': 40, 'V': 50, 'W': 20, 'X': 17,
+            'Y': 20, 'Z': 21
         }
         
         # Initialize multi-buy offers (item: [(quantity, price), ...])
@@ -22,7 +22,7 @@ class CheckoutSolution:
             'A': [(5, 200), (3, 130)],
             'B': [(2, 45)],
             'H': [(10, 80), (5, 45)],
-            'K': [(2, 150)],
+            'K': [(2, 120)],
             'P': [(5, 200)],
             'Q': [(3, 80)],
             'V': [(3, 130), (2, 90)]
@@ -37,6 +37,11 @@ class CheckoutSolution:
             'U': (3, 'U')   # Buy 3U, get one U free
         }
         
+        # Group discount offers (group of items, quantity, price)
+        group_offers = [
+            (['S', 'T', 'X', 'Y', 'Z'], 3, 45)  # Buy any 3 of (S,T,X,Y,Z) for 45
+        ]
+        
         # Initialize total price and item counts
         total_price = 0
         item_counts = {}
@@ -50,7 +55,35 @@ class CheckoutSolution:
             else:
                 item_counts[item] = 1
         
-        # Apply free item offers first
+        # Apply group discount offers first
+        # These are processed first as they potentially give the best value to customer
+        for group_items, required_count, offer_price in group_offers:
+            # Count how many qualifying items we have
+            qualifying_items = []
+            for item in group_items:
+                if item in item_counts:
+                    # Add each qualifying item to the list, repeated by its count
+                    qualifying_items.extend([item] * item_counts[item])
+            
+            # Sort items by price in descending order to get the best value
+            # This ensures we use the most expensive items in the group offer
+            qualifying_items.sort(key=lambda x: price_table[x], reverse=True)
+            
+            # Apply the group offer as many times as possible
+            num_offers_applied = len(qualifying_items) // required_count
+            if num_offers_applied > 0:
+                # Add the offers to the total price
+                total_price += num_offers_applied * offer_price
+                
+                # Remove the used items from the counts
+                used_items = qualifying_items[:num_offers_applied * required_count]
+                for item in used_items:
+                    item_counts[item] -= 1
+                    # Remove the item if its count becomes 0
+                    if item_counts[item] == 0:
+                        del item_counts[item]
+        
+        # Apply free item offers
         free_items = {}
         for item, (required_count, free_item) in free_item_offers.items():
             if item in item_counts:
@@ -95,3 +128,4 @@ class CheckoutSolution:
                 total_price += count * price_table[item]
         
         return total_price
+
