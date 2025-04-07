@@ -50,5 +50,19 @@ class CheckoutSolution:
         for item in skus:
             if item not in price_table:
                 return -1
+            if item in item_counts:
+                item_counts[item] += 1
+            else:
+                item_counts[item] = 1
+        # Calculate the total price considering special offers  
+        for item, count in item_counts.items():
+            if item in special_offers:
+                offer_count, offer_price = special_offers[item]
+                total_price += (count // offer_count) * offer_price
+                total_price += (count % offer_count) * price_table[item]
+            else:
+                total_price += count * price_table[item]
+        return total_price
         
+
 
